@@ -22,7 +22,8 @@ import java.util.function.Supplier;
 public class RedisConfig {
     private RedisClient redisClient() {
         return RedisClient.create(RedisURI.builder()
-                .withHost("localhost")
+//                .withHost("localhost")
+                .withHost("redis.supamid780-dev.svc.cluster.local")
                 .withPort(6379)
                 .withSsl(false)
                 .build());
