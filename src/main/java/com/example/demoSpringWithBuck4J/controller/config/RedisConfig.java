@@ -23,7 +23,7 @@ public class RedisConfig {
     private RedisClient redisClient() {
         return RedisClient.create(RedisURI.builder()
 //                .withHost("localhost")
-                .withHost("redis.supamid780-dev.svc.cluster.local")
+                .withHost("redis")
                 .withPort(6379)
                 .withSsl(false)
                 .build());
