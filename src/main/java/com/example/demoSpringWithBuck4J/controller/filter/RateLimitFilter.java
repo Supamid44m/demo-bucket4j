@@ -1,4 +1,4 @@
-
+package com.example.demoSpringWithBuck4J.controller.filter;
 
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.BucketConfiguration;
@@ -41,7 +41,7 @@ public class RateLimitFilter implements Filter {
         Bucket bucket = proxyManager.builder().build(key, bucketConfiguration);
 
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
-        log.debug(">>>>>>>>remainingTokens: {}", probe.getRemainingTokens());
+        log.info(">>>>>>>>remainingTokens: {}", probe.getRemainingTokens());
         if (probe.isConsumed()) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {

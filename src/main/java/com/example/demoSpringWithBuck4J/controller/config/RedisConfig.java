@@ -12,14 +12,22 @@ import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.codec.ByteArrayCodec;
 import io.lettuce.core.codec.RedisCodec;
 import io.lettuce.core.codec.StringCodec;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.Duration;
 import java.util.function.Supplier;
 
+@Slf4j
 @Configuration
 public class RedisConfig {
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
     private RedisClient redisClient() {
         return RedisClient.create(RedisURI.builder()
                 .withHost("localhost")
@@ -40,10 +48,27 @@ public class RedisConfig {
                 .build();
     }
 
+    //    @Bean
+//    public Supplier<BucketConfiguration> bucketConfiguration() {
+//        return () -> BucketConfiguration.builder()
+//                .addLimit(Bandwidth.simple(200L, Duration.ofMinutes(1L)))
+//                .build();
+//    }
     @Bean
     public Supplier<BucketConfiguration> bucketConfiguration() {
-        return () -> BucketConfiguration.builder()
-                .addLimit(Bandwidth.simple(200L, Duration.ofMinutes(1L)))
+        String capacityStr = redisTemplate.opsForValue().get("rate-limit:capacity");
+        log.info("current limit --->" + capacityStr);
+
+        long capacity = capacityStr != null ? Long.parseLong(capacityStr) : 10L;
+
+
+        // สร้าง config แค่ครั้งเดียว
+        BucketConfiguration config = BucketConfiguration.builder()
+                .addLimit(Bandwidth.simple(capacity, Duration.ofMinutes(5)))
                 .build();
+
+        return () -> config;
     }
+
+
 }
