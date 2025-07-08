@@ -36,8 +36,10 @@ public class RateLimitFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        log.info(">>>> RateLimitFilter invoked");
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
-        String key = httpRequest.getRemoteAddr();
+        String key = "user-test";
+
         Bucket bucket = proxyManager.builder().build(key, bucketConfiguration);
 
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
