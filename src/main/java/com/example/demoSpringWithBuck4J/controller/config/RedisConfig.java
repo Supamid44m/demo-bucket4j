@@ -56,18 +56,16 @@ public class RedisConfig {
 //    }
     @Bean
     public Supplier<BucketConfiguration> bucketConfiguration() {
-        String capacityStr = redisTemplate.opsForValue().get("rate-limit:capacity");
-        log.info("current limit --->" + capacityStr);
+        return () -> {
+            String capacityStr = redisTemplate.opsForValue().get("rate-limit:capacity");
+            long capacity = capacityStr != null ? Long.parseLong(capacityStr) : 10L;
 
-        long capacity = capacityStr != null ? Long.parseLong(capacityStr) : 10L;
+            log.info("Dynamic capacity: {}", capacity);
 
-
-        // สร้าง config แค่ครั้งเดียว
-        BucketConfiguration config = BucketConfiguration.builder()
-                .addLimit(Bandwidth.simple(capacity, Duration.ofMinutes(5)))
-                .build();
-
-        return () -> config;
+            return BucketConfiguration.builder()
+                    .addLimit(Bandwidth.simple(capacity, Duration.ofMinutes(5)))
+                    .build();
+        };
     }
 
 
